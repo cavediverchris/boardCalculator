@@ -2,14 +2,13 @@ function [] = createScriptTestHarness(th_name, scriptName)
 %CREATESCRIPTTESTHARNESS Summary of this function goes here
 %   Detailed explanation goes here
 % Create the file
-fid = fopen(th_name, 'wt');
+fid = fopen(th_name, 'w');
 
 % write a title;
-fprintf(fid, '%% Test harness for %s', scriptName);
-fprintf(fid, '%s', newline);
+fprintf(fid, '%%%% Test harness for %s', scriptName);
 
 % write a quick introduction
-fprintf(fid, '%s', '% This test harness is used to exercise the functionality for the System');
+fprintf(fid, '% This test harness is used to exercise the functionality for the System');
 fprintf(fid, '%s', newline);
 
 fprintf(fid, '%s', '% Under Test (SUT). This test harness may contain multiple tests for the');
@@ -24,6 +23,8 @@ fprintf(fid, '%s', newline);
 % write a template test
 fprintf(fid, '%s', '%% Template Test 1: Insert Test Name');
 fprintf(fid, '%s', newline);
+fprintf(fid, '%s','% Here write some text to describe what the test is');
+
 fprintf(fid, '%s', newline);
 
 fprintf(fid, '%s', 'inputData = 1;');
