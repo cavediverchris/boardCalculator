@@ -89,8 +89,8 @@ if exist(highLevelScriptsFolder, 'dir') == 0
     % ACTION: Create the High-Level Scripts folder, and add it to the path,
     % and to the project
     mkdir(highLevelScriptsFolder);
-    addPath(Proj,highLevelScriptsFolder);
     addFolderIncludingChildFiles(Proj, highLevelScriptsFolder);
+    addPath(Proj,highLevelScriptsFolder);
 end
 
 % Second, need to check if the Low-Level Scripts folder actually exists
@@ -101,8 +101,8 @@ if exist(lowLevelScriptsFolder, 'dir') == 0
     % ACTION: Create the Low-Level Scripts folder, and add it to the path,
     % and to the project
     mkdir(lowLevelScriptsFolder);
-    addPath(Proj,lowLevelScriptsFolder);
     addFolderIncludingChildFiles(Proj, lowLevelScriptsFolder);
+    addPath(Proj,lowLevelScriptsFolder);
 end
 
 
@@ -114,14 +114,26 @@ end
 if strcmp(FileType, 'Script')
     % CASE: User wants to create a High-Level Live Script
     % ACTION: Create a new Live Script in the High-Level Scripts folder
-    % TODO
     ParentFolder = highLevelScriptsFolder;
-    createScript(NewScriptName)
-    % TODO - convert to live script
+    
+    % Create template M file
+    createScript(NewScriptName);
+    
+    % Convert to live script
+    matlab.internal.liveeditor.openAndSave(...
+        [char(Proj.RootFolder), '\', NewScriptName, '.m'], ...
+        [char(Proj.RootFolder), '\', NewScriptName, '.mlx']);
+    
+    % delete initial m file
+    delete([char(Proj.RootFolder), '\', NewScriptName, '.m']);
+    
 elseif strcmp(FileType, 'Function')
     % CASE: User wants to create a Low-Level Function
     % ACTION: Create a new MATLAB Function in the Low-Level Scripts folder
-    ParentFolder = lowLevelScriptsFolder;
+    ParentFolder = strcat(lowLevelScriptsFolder, '\', NewScriptName);
+    mkdir(ParentFolder);
+    addPath(Proj,ParentFolder);
+    addFolderIncludingChildFiles(Proj, ParentFolder);
     createScript(NewScriptName)
 end
 
@@ -130,8 +142,15 @@ end
 if strcmp(FileType, 'Function')
     % CASE: User is creating a MATLAB script
     % ACTION: Create a unit test script
-    th_name = sprintf('test_%s.m', NewScriptName);
-    createScriptTestHarness(th_name, NewScriptName)
+    orig_th_name = sprintf('test_%s.m', NewScriptName);
+    createScriptTestHarness(orig_th_name, NewScriptName);
+    
+    % Create the name for the test script as an MLX file
+    th_name = string(orig_th_name);
+    th_name = replace(th_name, ".m", ".mlx");
+    
+    % Convert to live script
+    matlab.internal.liveeditor.openAndSave(orig_th_name, char(th_name));
 end
 
 %% Add Requirements Module
@@ -162,7 +181,7 @@ end
 %
 
 if strcmp(FileType, 'Script')
-    movefile(strcat(NewScriptName, '.m'), strcat(ParentFolder, '\', NewScriptName, '.m'));
+    movefile(strcat(NewScriptName, '.mlx'), strcat(ParentFolder, '\', NewScriptName, '.mlx'));
 elseif strcmp(FileType, 'Function')
     movefile(strcat(NewScriptName, '.m'), strcat(ParentFolder, '\', NewScriptName, '.m'));
     movefile(th_name, strcat(ParentFolder, '\', th_name));

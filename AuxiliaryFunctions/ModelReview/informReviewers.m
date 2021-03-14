@@ -48,6 +48,7 @@ if UserFound == false
     return;
 end
 
+clear CurrUser NumReviewers ReviewerIdx ReviewersTable UserFound
 %% Get project object
 % A SIMULINK Project Object is initialised.
 
